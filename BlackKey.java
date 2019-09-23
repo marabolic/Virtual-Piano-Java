@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class BlackKey extends JButton implements ActionListener, KeyListener {
+public class BlackKey extends JButton implements ActionListener {
     private int octave;
     private Octaves.BLACK_KEY key;
 
@@ -20,7 +20,6 @@ public class BlackKey extends JButton implements ActionListener, KeyListener {
         key = b;
         text = " ";
         keyCode = getKeyEvent();
-        addKeyListener(this);
         addActionListener(this);
     }
 
@@ -95,27 +94,4 @@ public class BlackKey extends JButton implements ActionListener, KeyListener {
         }
     }
 
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() == keyCode){
-            try {
-                MidiPlayer m = new MidiPlayer();
-                StringBuilder s = new StringBuilder();
-                s.append(keyToPitch(key)).append("#").append(octave + 2);
-                m.play(MusicSymbol.noteMidi.get(s.toString()));
-            } catch (MidiUnavailableException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-
-    }
 }

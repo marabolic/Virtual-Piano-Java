@@ -1,21 +1,23 @@
 package symbols;
 
 import javax.swing.*;
-import javax.swing.text.GapContent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
-public class Octaves extends JLayeredPane implements KeyListener {
+public class Octaves extends JLayeredPane {
     public int octaveID;
     private boolean showText = false;
 
+    private ArrayList<WhiteKey> whiteKeyArray;
+    private ArrayList<BlackKey> blackKeyArray;
+
     public static enum BLACK_KEY {CSHARP, DSHARP, FSHARP, GSHARP, ASHARP}
+
     public static final int PIANO_WIDTH = 1400, PIANO_HEIGHT = 200,
-                WHITE_W = 33, WHITE_H = 200, GAP = 1, BLACK_W = 20, BLACK_H = 120,
-                OCTAVE_WIDTH = PianoFrame.NUM_KEYS * WHITE_W + (PianoFrame.NUM_KEYS - 1) * GAP;
+            WHITE_W = 33, WHITE_H = 200, GAP = 1, BLACK_W = 20, BLACK_H = 120,
+            OCTAVE_WIDTH = PianoFrame.NUM_KEYS * WHITE_W + (PianoFrame.NUM_KEYS - 1) * GAP;
 
     public Octaves() {
         super();
@@ -24,7 +26,11 @@ public class Octaves extends JLayeredPane implements KeyListener {
         this.add(Box.createRigidArea(new Dimension(0, 0)));
         this.setBackground(Color.DARK_GRAY);
         this.setOpaque(true);
-        makeKeys(x,y);
+        setFocusable(true);
+        requestFocusInWindow();
+        whiteKeyArray = new ArrayList<WhiteKey>();
+        blackKeyArray = new ArrayList<BlackKey>();
+        makeKeys(x, y);
     }
 
     public boolean getShowText() {
@@ -33,6 +39,21 @@ public class Octaves extends JLayeredPane implements KeyListener {
 
     public void setShowText(boolean showText) {
         this.showText = showText;
+        if (showText) {
+            for (int i = 0; i < whiteKeyArray.size(); i++) {
+                whiteKeyArray.get(i).setText(whiteKeyArray.get(i).getMyText());
+            }
+            for (int i = 0; i < blackKeyArray.size(); i++) {
+                blackKeyArray.get(i).setText(blackKeyArray.get(i).getMyText());
+            }
+        } else {
+            for (int i = 0; i < whiteKeyArray.size(); i++) {
+                whiteKeyArray.get(i).setText(" ");
+            }
+            for (int i = 0; i < blackKeyArray.size(); i++) {
+                blackKeyArray.get(i).setText(" ");
+            }
+        }
     }
 
     public void makeKeys(int x, int y) {
@@ -46,10 +67,8 @@ public class Octaves extends JLayeredPane implements KeyListener {
                 whiteButton.setForeground(Color.black);
                 whiteButton.setMargin(new Insets(0, 0, 0, 0));
                 whiteButton.setFont(new Font("Arial", Font.PLAIN, 15));
-                if (showText) {
-                    System.out.println(whiteButton.getMyText());
-                    whiteButton.setText(whiteButton.getMyText());
-                }
+
+                whiteKeyArray.add(whiteButton);
                 this.add(whiteButton, new Integer(1));
                 this.add(Box.createRigidArea(new Dimension(2, 0)));
                 x += WHITE_W + GAP;
@@ -74,18 +93,6 @@ public class Octaves extends JLayeredPane implements KeyListener {
             b5.setMargin(new Insets(0, 0, 0, 0));
             b5.setFont(new Font("Arial", Font.PLAIN, 14));
 
-            if (showText == true) {
-                b1.setForeground(Color.white);
-                b1.setText(b1.getMyText());
-                b2.setForeground(Color.white);
-                b2.setText(b2.getMyText());
-                b3.setForeground(Color.white);
-                b3.setText(b3.getMyText());
-                b4.setForeground(Color.white);
-                b4.setText(b4.getMyText());
-                b5.setForeground(Color.white);
-                b5.setText(b5.getMyText());
-            }
             int overlapWidth = (BLACK_W - GAP) / 2;
             b1.setBounds(x + WHITE_W - overlapWidth + OCTAVE_WIDTH * i, y, BLACK_W, BLACK_H);
             b2.setBounds(x + WHITE_W * 2 + GAP - overlapWidth + OCTAVE_WIDTH * i, y, BLACK_W, BLACK_H);
@@ -99,6 +106,12 @@ public class Octaves extends JLayeredPane implements KeyListener {
             b4.setBackground(Color.black);
             b5.setBackground(Color.black);
 
+            blackKeyArray.add(b1);
+            blackKeyArray.add(b2);
+            blackKeyArray.add(b3);
+            blackKeyArray.add(b4);
+            blackKeyArray.add(b5);
+
             this.add(b1, new Integer(2));
             this.add(b2, new Integer(2));
             this.add(b3, new Integer(2));
@@ -109,18 +122,4 @@ public class Octaves extends JLayeredPane implements KeyListener {
 
 
 
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
-
-    }
 }

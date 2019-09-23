@@ -7,7 +7,7 @@ public class FlowView extends JPanel {
 
     private static final int NUM_OF_QUARTERS = 10;
     private Composition composition = null;
-    private int cursor = 0;
+    private int cursor;
     private boolean isTxt = false;
 
     public FlowView() {
@@ -20,6 +20,10 @@ public class FlowView extends JPanel {
         repaint();
     }
 
+    public void resetCursor(){
+        cursor = 0;
+    }
+
     public void setTxt(boolean txt) {
         isTxt = txt;
     }
@@ -28,29 +32,27 @@ public class FlowView extends JPanel {
         return isTxt;
     }
 
-    void moveCursor(){
+    public void moveCursor(){
         cursor++;
+        this.revalidate();
+        this.repaint();
     }
-
-
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         for (int i = 0; i < NUM_OF_QUARTERS; i++){
             g.fillRect(i * getWidth()/NUM_OF_QUARTERS, 4 * getHeight()/5, 3, getHeight() / 6);
         }
 
         if (composition == null)
             return;
-        System.out.println("flow print");
-
 
         int displayDuration =  0;
         int j = 0;
-        while (displayDuration < NUM_OF_QUARTERS * 2){
+        while (displayDuration < NUM_OF_QUARTERS * 2 && (cursor + j) < composition.compositionSize()){
             MusicSymbol symbol = composition.getIndex(cursor + j);
+            System.out.println(cursor);
             if (symbol instanceof Pause){
                 if (symbol.getDuration() == MusicSymbol.DURATION.QUARTER){
                     g.setColor(Color.getHSBColor(0.96f, 0.74f, 0.40f));

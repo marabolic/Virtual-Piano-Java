@@ -1,7 +1,10 @@
 package symbols;
 
+import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiUnavailableException;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -9,11 +12,12 @@ import java.awt.event.KeyListener;
 import java.util.HashMap;
 
 
-public class WhiteKey extends JButton implements ActionListener, KeyListener {
+public class WhiteKey extends JButton implements ActionListener, ChangeListener {
     private int key;
     private int octave;
     private int keyCode;
     private String text;
+    private boolean pressed = false;
     public static HashMap<Integer, Integer> keyButtons;
 
     public WhiteKey(int octave, int key){
@@ -21,8 +25,20 @@ public class WhiteKey extends JButton implements ActionListener, KeyListener {
         this.octave = octave;
         this.key = key;
         keyCode = getKeyEvent();
-        addKeyListener(this);
+        addChangeListener(this);
         addActionListener(this);
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyCode,0), "pressed");
+        getActionMap().put("pressed", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getModel().setPressed(true);
+            }
+        });
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyCode,0, true), "released");
+        getActionMap().put("released", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getModel().setPressed(false);
+            }
+        });
     }
 
     public String getMyText() {
@@ -99,6 +115,7 @@ public class WhiteKey extends JButton implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
+        /*
         try {
             MidiPlayer m = new MidiPlayer();
             StringBuilder s = new StringBuilder();
@@ -107,27 +124,20 @@ public class WhiteKey extends JButton implements ActionListener, KeyListener {
         } catch (MidiUnavailableException e) {
             e.printStackTrace();
         }
+        */
     }
 
-    @Override
-    public void keyTyped(KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() == keyCode){
-            try {
-                MidiPlayer m = new MidiPlayer();
-                StringBuilder s = new StringBuilder();
-                s.append(keyToPitch(key)).append(octave + 2);
-                m.play(MusicSymbol.noteMidi.get(s.toString()));
-            } catch (MidiUnavailableException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
-    @Override
     public void keyPressed(KeyEvent keyEvent) {
 
         if (keyEvent.getKeyCode() == keyCode){
-            //doClick();
+            getModel().setPressed(true);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            getModel().setPressed(false);
             try {
                 MidiPlayer m = new MidiPlayer();
                 StringBuilder s = new StringBuilder();
@@ -139,8 +149,31 @@ public class WhiteKey extends JButton implements ActionListener, KeyListener {
         }
     }
 
-    @Override
-    public void keyReleased(KeyEvent keyEvent) {
 
+    @Override
+    public void stateChanged(ChangeEvent e) {
+        ButtonModel model = getModel();
+        if (model.isPressed() != pressed) {
+            if (model.isPressed()) {
+                System.out.println("pressed");
+                try {
+                    MidiPlayer m = new MidiPlayer();
+                    System.out.println(keyCode);
+                    m.play(MusicSymbol.noteMidi.get(MusicSymbol.keyNote.get(text)));
+                } catch (MidiUnavailableException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            else {
+                System.out.println("released");
+                try {
+                    MidiPlayer m = new MidiPlayer();
+                    m.release(MusicSymbol.noteMidi.get(MusicSymbol.keyNote.get(text)));
+                } catch (MidiUnavailableException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            pressed = model.isPressed();
+        }
     }
 }

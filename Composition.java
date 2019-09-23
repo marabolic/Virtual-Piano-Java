@@ -17,6 +17,10 @@ public class Composition {
         readComposition(filename);
     }
 
+    public int compositionSize(){
+        return musicSymbols.size();
+    }
+
     public void addNote(Note note) {
         musicSymbols.add(note);
     }
@@ -33,9 +37,12 @@ public class Composition {
         return musicSymbols.get(i);
     }
 
+
+
     public void readComposition(String filename){
         try {
             File file = new File(filename);
+            if (file == null) System.out.println("File is null");
             Scanner myReader = new Scanner(file);
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();

@@ -1,6 +1,9 @@
 package symbols;
 
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.ShortMessage;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -12,9 +15,11 @@ public class PianoFrame extends JFrame {
 
     public static final int NUM_OCTAVES = 5;
     public static final int NUM_KEYS = 7;
+    public static final int LONG_PAUSE = 200, SHORT_PAUSE = 100;
     public static Composition composition;
     public static FlowView flow;
     public static Octaves octaves;
+    public static MusicPlayer player;
 
     public PianoFrame() {
         super("Virtual Piano");
@@ -78,8 +83,6 @@ public class PianoFrame extends JFrame {
         });
     }
 
-
-
     private void addMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu;
@@ -100,7 +103,9 @@ public class PianoFrame extends JFrame {
                 chooser.setFileFilter(filter);
                 int returnVal = chooser.showOpenDialog(getParent());
                 if(returnVal == JFileChooser.APPROVE_OPTION) {
-                    composition = new Composition(chooser.getSelectedFile().getName());
+                    flow.resetCursor();
+                    composition = new Composition(chooser.getSelectedFile().getAbsolutePath());
+                    System.out.println(chooser.getSelectedFile().getName());
                     flow.loadComposition(composition);
                 }
             }
@@ -134,12 +139,19 @@ public class PianoFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 octaves.setShowText(!octaves.getShowText());
-                octaves.makeKeys(110,0);
+                octaves.revalidate();
+                octaves.repaint();
             }
         });
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem("Wait to play");
+        cbMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+            }
+        });
         menu.add(cbMenuItem);
 
         menuBar.add(menu);
@@ -147,7 +159,7 @@ public class PianoFrame extends JFrame {
         this.setJMenuBar(menuBar);
     }
 
-    private void addPianoPanel(Composition composition){
+    private void addPianoPanel(){
 
         JPanel piano = new JPanel();
         JPanel buttons = new JPanel();
@@ -168,24 +180,25 @@ public class PianoFrame extends JFrame {
         start.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
+                if (player == null || player.isRunCompleted())
+                    player = new MusicPlayer();
+                player.play();
             }
         });
         pause.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                try {
-                    MidiPlayer player = new MidiPlayer();
-                } catch (MidiUnavailableException e) {
-                    e.printStackTrace();
-                }
-
+                if (player == null || player.isRunCompleted()) return;
+                player.pause();
             }
         });
         stop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
+                if (player == null || player.isRunCompleted()) return;
+                player.interrupt();
+                flow.resetCursor();
+                flow.repaint();
             }
         });
         record.addActionListener(new ActionListener() {
@@ -214,7 +227,6 @@ public class PianoFrame extends JFrame {
         c.weighty = 1.0;
         c.insets = new Insets(20, 30, 90, 30);
 
-        octaves = new Octaves();
         keys.add(octaves);
         piano.add(buttons, BorderLayout.NORTH);
         piano.add(keys, BorderLayout.CENTER);
@@ -222,7 +234,6 @@ public class PianoFrame extends JFrame {
     }
 
     private FlowView addFlowPanel(){
-        flow = new FlowView();
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 1;
@@ -241,10 +252,12 @@ public class PianoFrame extends JFrame {
         this.setLayout(new GridBagLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1500, 650);
+        octaves = new Octaves();
+        flow = new FlowView();
         MusicSymbol.readMap("map.txt");
         flow = addFlowPanel();
-        addPianoPanel(composition);
         addMenu();
+        addPianoPanel();
         this.setVisible(true);
     }
 }

@@ -9,6 +9,7 @@ public class MidiPlayer {
     private static final int DEFAULT_INSTRUMENT = 1;
     private MidiChannel channel;
 
+
     public MidiPlayer() throws MidiUnavailableException {
         this(DEFAULT_INSTRUMENT);
     }
@@ -20,18 +21,27 @@ public class MidiPlayer {
 
     public void play(final int note) {
         channel.noteOn(note, 50);
+
     }
 
     public void release(final int note) {
         channel.noteOff(note, 50);
     }
 
-    public void play(final int note, final long length)
-            throws InterruptedException {
+    public void play(final int note, final long length) throws InterruptedException {
         play(note);
         Thread.sleep(length);
         release(note);
     }
+
+    public void pause(final long length) throws InterruptedException {
+        Thread.sleep(length);
+    }
+
+    public void playChord(final int note, final long length) throws InterruptedException {
+        play(note);
+    }
+
 
     private static MidiChannel getChannel(int instrument)
             throws MidiUnavailableException {
