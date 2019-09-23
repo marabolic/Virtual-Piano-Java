@@ -9,18 +9,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Composition {
-    public Part leftPart;
-    public Part rightPart;
+    private ArrayList<MusicSymbol> musicSymbols;
 
-    public Composition(Part left, Part right) {
-        leftPart = left;
-        rightPart = right;
+
+    public Composition(String filename) {
+        musicSymbols = new ArrayList<MusicSymbol>();
+        readComposition(filename);
     }
 
+    public void addNote(Note note) {
+        musicSymbols.add(note);
+    }
 
-    public static void readComposition(String filename){
-        Part leftPart = new Part();
-        Part rightPart = new Part();
+    public void addPause(Pause pause) {
+        musicSymbols.add(pause);
+    }
+
+    public void addChord(Chord chord) {
+        musicSymbols.add(chord);
+    }
+
+    public MusicSymbol getIndex(int i){
+        return musicSymbols.get(i);
+    }
+
+    public void readComposition(String filename){
         try {
             File file = new File(filename);
             Scanner myReader = new Scanner(file);
@@ -43,7 +56,7 @@ public class Composition {
                         Pattern notePattern = Pattern.compile(notes);
                         Matcher noteMatcher = notePattern.matcher(symbolMatcher.group(0));
 
-                        Chord leftChord = new Chord(), rightChord = new Chord();
+                        Chord chord = new Chord();
                         while (noteMatcher.find()) {
                             String getNote = MusicSymbol.keyNote.get(noteMatcher.group(0));
                             Note note;
@@ -53,45 +66,26 @@ public class Composition {
                             else
                                 note = new Note(MusicSymbol.DURATION.QUARTER, getNote.charAt(0),
                                         false,  Character.getNumericValue(getNote.charAt(1)));
-                            //Pause pause = new Pause(MusicSymbol.DURATION.QUARTER);
-                            if (note.getOctave() > 3) {
-                                rightChord.addNote(note);
-                                //leftChord.addPause(pause);
-                            }
-                            else {
-                                leftChord.addNote(note);
-                                //rightChord.addPause(pause);
-                            }
+                            chord.addNote(note);
                             //System.out.println("nota u akordu");
                         }
-                        rightChord.printTxt();
-                        leftChord.printTxt();
-
-
-                        leftPart.addChord(leftChord);
-                        rightPart.addChord(rightChord);
-                        //System.out.println(bracketMatcher.group(0));
+                        addChord(chord);
                     }
 
                     else if (symbolMatcher.group(0).length() == 1){ //cevrtina
 
                         if (symbolMatcher.group(0).equals("|")){
                             Pause shortPause = new Pause(MusicSymbol.DURATION.EIGHTH);
-                            leftPart.addPause(shortPause);
-                            rightPart.addPause(shortPause);
-                            shortPause.printTxt();
+                            addPause(shortPause);
                             //System.out.println("kratka pauza");
                         }
                         else if (symbolMatcher.group(0).equals(" ")){
                             Pause longPause = new Pause(MusicSymbol.DURATION.QUARTER);
-                            leftPart.addPause(longPause);
-                            rightPart.addPause(longPause);
-                            longPause.printTxt();
+                            addPause(longPause);
                             //System.out.println("duga pauza");
                         }
                         else {
                             String getNote = MusicSymbol.keyNote.get(symbolMatcher.group(0));
-                            //System.out.println(symbolMatcher.group(0));
                             Note note;
                             if (getNote.length() == 3)
                                 note = new Note(MusicSymbol.DURATION.QUARTER, getNote.charAt(0),
@@ -99,16 +93,7 @@ public class Composition {
                             else
                                 note = new Note(MusicSymbol.DURATION.QUARTER, getNote.charAt(0),
                                         false,  Character.getNumericValue(getNote.charAt(1)));
-                            Pause pause = new Pause(note.getDuration());
-                            if (note.getOctave() > 3) {
-                                rightPart.addNote(note);
-                                leftPart.addPause(pause);
-                            }
-                            else {
-                                leftPart.addNote(note);
-                                rightPart.addPause(pause);
-                            }
-                            note.printTxt();
+                            addNote(note);
                            // System.out.println("cetvrtina");
                         }
                     }
@@ -120,21 +105,12 @@ public class Composition {
                             String getNote = MusicSymbol.keyNote.get(eightMatcher.group(0));
                             Note note;
                             if (getNote.length() == 3)
-                                note = new Note(MusicSymbol.DURATION.QUARTER, getNote.charAt(0),
+                                note = new Note(MusicSymbol.DURATION.EIGHTH, getNote.charAt(0),
                                         true,  Character.getNumericValue(getNote.charAt(2)));
                             else
-                                note = new Note(MusicSymbol.DURATION.QUARTER, getNote.charAt(0),
+                                note = new Note(MusicSymbol.DURATION.EIGHTH, getNote.charAt(0),
                                         false,  Character.getNumericValue(getNote.charAt(1)));
-                            Pause pause = new Pause(note.getDuration());
-                            if (note.getOctave() > 3) {
-                                rightPart.addNote(note);
-                                leftPart.addPause(pause);
-                            }
-                            else {
-                                leftPart.addNote(note);
-                                rightPart.addPause(pause);
-                            }
-                            note.printTxt();
+                            addNote(note);
                             //System.out.println("osmina"); //osmina
                         }
                     }
@@ -145,7 +121,7 @@ public class Composition {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-        Composition composition = new Composition(leftPart, rightPart);
+
 
     }
 }

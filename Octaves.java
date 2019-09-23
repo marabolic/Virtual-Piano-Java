@@ -10,7 +10,7 @@ public class Octaves extends JLayeredPane {
     public int octaveID;
     public static enum BLACK_KEY {CSHARP, DSHARP, FSHARP, GSHARP, ASHARP}
     public static final int PIANO_WIDTH = 1400, PIANO_HEIGHT = 200,
-                WHITE_W = 27, WHITE_H = 200, GAP = 1, BLACK_W = 16, BLACK_H = 120,
+                WHITE_W = 33, WHITE_H = 200, GAP = 1, BLACK_W = 18, BLACK_H = 120,
                 OCTAVE_WIDTH = PianoFrame.NUM_KEYS * WHITE_W + (PianoFrame.NUM_KEYS - 1) * GAP;
 
     public Octaves() {

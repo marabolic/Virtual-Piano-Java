@@ -37,7 +37,7 @@ public abstract class MusicSymbol {
         return duration;
     }
 
-    public abstract void printTxt();
+    public abstract String printTxt(boolean isTxt);
 
     public void setMidiChar(String midiChar){
         this.midiChar = midiChar;

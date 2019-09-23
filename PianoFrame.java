@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
 
 public class PianoFrame extends JFrame {
 
-    public static final int NUM_OCTAVES = 6;
+    public static final int NUM_OCTAVES = 5;
     public static final int NUM_KEYS = 7;
 
     public PianoFrame() {
@@ -174,10 +174,9 @@ public class PianoFrame extends JFrame {
         this.add(piano, c);
     }
 
-    private void addFlowPanel(){
-        JPanel flow = new JPanel();
+    private FlowView addFlowPanel(){
+        FlowView flow = new FlowView();
         GridBagConstraints c = new GridBagConstraints();
-        flow.setBackground(Color.GRAY);
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 1;
         c.gridy = 0;
@@ -187,18 +186,20 @@ public class PianoFrame extends JFrame {
         c.weighty = 0.5;
         c.insets = new Insets(50, 120, 10, 120);
         this.add(flow, c);
+        flow.repaint();
+        return flow;
     }
 
     private void createEnviroment() {
-                this.setLayout(new GridBagLayout());
-                this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                this.setSize(1500, 650);
-                addPianoPanel();
-                addFlowPanel();
-                addMenu();
-                MusicSymbol.readMap("map.txt");
-                Composition.readComposition("fur_elise3.txt");
-
-                this.setVisible(true);
+        this.setLayout(new GridBagLayout());
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(1500, 650);
+        MusicSymbol.readMap("map.txt");
+        Composition composition = new Composition("fur_elise3.txt");
+        FlowView flow = addFlowPanel();
+        addPianoPanel();
+        addMenu();
+        flow.loadComposition(composition);
+        this.setVisible(true);
     }
 }

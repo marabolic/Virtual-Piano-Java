@@ -6,12 +6,19 @@ public class Pause extends MusicSymbol {
     }
 
     @Override
-    public void printTxt() {
+    public String printTxt(boolean isTxt) {
         String pause = "";
-        if (getDuration() == DURATION.QUARTER)
-            pause = " ";
-        else
-            pause = "|";
-        System.out.println(pause);
+        if (isTxt) {
+            if (getDuration() == DURATION.QUARTER)
+                pause = " ";
+            else
+                pause = "|";
+        }
+        return pause.toString();
+    }
+
+    @Override
+    public String toString() {
+        return " ";
     }
 }

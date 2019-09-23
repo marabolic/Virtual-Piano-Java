@@ -45,22 +45,28 @@ public class Note extends MusicSymbol {
     }
 
     @Override
-    public void printTxt() {
+    public String printTxt(boolean isTxt) {
+        StringBuilder note = new StringBuilder();
+        if (isTxt) {
+            note.append(pitch);
+            if (sharp)
+                note.append('#');
+            note.append(octave);
+            String key = noteKey.get(note.toString());
+        }
+        else{
+
+        }
+        return note.toString();
+    }
+
+    @Override
+    public String toString() {
         StringBuilder note = new StringBuilder();
         note.append(pitch);
         if (sharp)
             note.append('#');
         note.append(octave);
-        String key = noteKey.get(note.toString());
-        System.out.println(key);
-    }
-
-    @Override
-    public String toString() {
-        return "Note{" +
-                "pitch=" + pitch +
-                ", octave=" + octave +
-                ", sharp=" + sharp +
-                '}';
+        return note.toString();
     }
 }
