@@ -53,11 +53,16 @@ public class Note extends MusicSymbol {
                 note.append('#');
             note.append(octave);
             String key = noteKey.get(note.toString());
+            return key.toString();
         }
         else{
-
+            note.append(pitch);
+            if (sharp)
+                note.append('#');
+            note.append(octave);
+            return note.toString();
         }
-        return note.toString();
+
     }
 
     @Override

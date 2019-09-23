@@ -1,5 +1,6 @@
 package symbols;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ public abstract class MusicSymbol {
     private DURATION duration; //4 or 8
     private String midiChar;
     private boolean inChord = false;
-    private boolean firstSplit = false, secondSplit = false;
 
     public MusicSymbol(DURATION duration) {
         this.duration = duration;
@@ -51,21 +51,6 @@ public abstract class MusicSymbol {
         this.inChord = inChord;
     }
 
-    public boolean isFirstSplit() {
-        return firstSplit;
-    }
-
-    public void setFirstSplit(boolean firstSplit) {
-        this.firstSplit = firstSplit;
-    }
-
-    public boolean isSecondSplit() {
-        return secondSplit;
-    }
-
-    public void setSecondSplit(boolean secondSplit) {
-        this.secondSplit = secondSplit;
-    }
 
     public static void readMap(String filename){
         noteMidi = new HashMap<String, Integer>();

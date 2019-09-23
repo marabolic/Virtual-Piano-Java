@@ -5,12 +5,16 @@ import javax.swing.text.GapContent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public class Octaves extends JLayeredPane {
+public class Octaves extends JLayeredPane implements KeyListener {
     public int octaveID;
+    private boolean showText = false;
+
     public static enum BLACK_KEY {CSHARP, DSHARP, FSHARP, GSHARP, ASHARP}
     public static final int PIANO_WIDTH = 1400, PIANO_HEIGHT = 200,
-                WHITE_W = 33, WHITE_H = 200, GAP = 1, BLACK_W = 18, BLACK_H = 120,
+                WHITE_W = 33, WHITE_H = 200, GAP = 1, BLACK_W = 20, BLACK_H = 120,
                 OCTAVE_WIDTH = PianoFrame.NUM_KEYS * WHITE_W + (PianoFrame.NUM_KEYS - 1) * GAP;
 
     public Octaves() {
@@ -18,22 +22,40 @@ public class Octaves extends JLayeredPane {
         int x = 110, y = 0;
         this.setPreferredSize(new Dimension(PIANO_WIDTH, PIANO_HEIGHT));
         this.add(Box.createRigidArea(new Dimension(0, 0)));
-
         this.setBackground(Color.DARK_GRAY);
         this.setOpaque(true);
+        makeKeys(x,y);
+    }
 
+    public boolean getShowText() {
+        return showText;
+    }
+
+    public void setShowText(boolean showText) {
+        this.showText = showText;
+    }
+
+    public void makeKeys(int x, int y) {
         for (int i = 0; i < PianoFrame.NUM_OCTAVES; i++) {
             for (int j = 0; j < PianoFrame.NUM_KEYS; j++) {
-
-                WhiteKey whiteButton = new WhiteKey(i,j);
+                WhiteKey whiteButton = new WhiteKey(i, j);
                 whiteButton.setBounds(x + i * OCTAVE_WIDTH + i * GAP, y, WHITE_W, WHITE_H);
                 whiteButton.setBackground(Color.white);
+                whiteButton.setMargin(new Insets(0, 0, 0, 0));
+                whiteButton.setFont(new Font("Arial", Font.PLAIN, 15));
+                whiteButton.setForeground(Color.black);
+                whiteButton.setMargin(new Insets(0, 0, 0, 0));
+                whiteButton.setFont(new Font("Arial", Font.PLAIN, 15));
+                if (showText) {
+                    System.out.println(whiteButton.getMyText());
+                    whiteButton.setText(whiteButton.getMyText());
+                }
                 this.add(whiteButton, new Integer(1));
                 this.add(Box.createRigidArea(new Dimension(2, 0)));
                 x += WHITE_W + GAP;
             }
             x = 110;
-         }
+        }
 
         for (int i = 0; i < PianoFrame.NUM_OCTAVES; i++) {
             BlackKey b1 = new BlackKey(i, BLACK_KEY.CSHARP);
@@ -41,6 +63,29 @@ public class Octaves extends JLayeredPane {
             BlackKey b3 = new BlackKey(i, BLACK_KEY.FSHARP);
             BlackKey b4 = new BlackKey(i, BLACK_KEY.GSHARP);
             BlackKey b5 = new BlackKey(i, BLACK_KEY.ASHARP);
+            b1.setMargin(new Insets(0, 0, 0, 0));
+            b1.setFont(new Font("Arial", Font.PLAIN, 14));
+            b2.setMargin(new Insets(0, 0, 0, 0));
+            b2.setFont(new Font("Arial", Font.PLAIN, 14));
+            b3.setMargin(new Insets(0, 0, 0, 0));
+            b3.setFont(new Font("Arial", Font.PLAIN, 14));
+            b4.setMargin(new Insets(0, 0, 0, 0));
+            b4.setFont(new Font("Arial", Font.PLAIN, 14));
+            b5.setMargin(new Insets(0, 0, 0, 0));
+            b5.setFont(new Font("Arial", Font.PLAIN, 14));
+
+            if (showText == true) {
+                b1.setForeground(Color.white);
+                b1.setText(b1.getMyText());
+                b2.setForeground(Color.white);
+                b2.setText(b2.getMyText());
+                b3.setForeground(Color.white);
+                b3.setText(b3.getMyText());
+                b4.setForeground(Color.white);
+                b4.setText(b4.getMyText());
+                b5.setForeground(Color.white);
+                b5.setText(b5.getMyText());
+            }
             int overlapWidth = (BLACK_W - GAP) / 2;
             b1.setBounds(x + WHITE_W - overlapWidth + OCTAVE_WIDTH * i, y, BLACK_W, BLACK_H);
             b2.setBounds(x + WHITE_W * 2 + GAP - overlapWidth + OCTAVE_WIDTH * i, y, BLACK_W, BLACK_H);
@@ -60,6 +105,22 @@ public class Octaves extends JLayeredPane {
             this.add(b4, new Integer(2));
             this.add(b5, new Integer(2));
         }
+    }
+
+
+
+    @Override
+    public void keyTyped(KeyEvent keyEvent) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent keyEvent) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent keyEvent) {
 
     }
 }

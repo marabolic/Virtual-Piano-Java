@@ -1,6 +1,8 @@
 package symbols;
 
+import javax.sound.midi.MidiUnavailableException;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +12,9 @@ public class PianoFrame extends JFrame {
 
     public static final int NUM_OCTAVES = 5;
     public static final int NUM_KEYS = 7;
+    public static Composition composition;
+    public static FlowView flow;
+    public static Octaves octaves;
 
     public PianoFrame() {
         super("Virtual Piano");
@@ -75,7 +80,7 @@ public class PianoFrame extends JFrame {
 
 
 
-    private void addMenu(){
+    private void addMenu() {
         JMenuBar menuBar = new JMenuBar();
         JMenu menu;
         JMenuItem menuItem;
@@ -86,15 +91,52 @@ public class PianoFrame extends JFrame {
         menuBar.add(menu);
 
         menuItem = new JMenuItem("Choose file");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JFileChooser chooser = new JFileChooser();
+                FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                        "Text file", "txt");
+                chooser.setFileFilter(filter);
+                int returnVal = chooser.showOpenDialog(getParent());
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    composition = new Composition(chooser.getSelectedFile().getName());
+                    flow.loadComposition(composition);
+                }
+            }
+        });
         menu.add(menuItem);
         menu.addSeparator();
         menuItem = new JMenuItem("Exit");
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                System.exit(0);
+            }
+        });
         menu.add(menuItem);
 
         menu = new JMenu("Options");
         menu.setMnemonic(KeyEvent.VK_N);
 
+        cbMenuItem = new JCheckBoxMenuItem("Display keys");
+        cbMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                flow.setTxt(!flow.getTxt());
+                flow.repaint();
+            }
+        });
+        menu.add(cbMenuItem);
+
         cbMenuItem = new JCheckBoxMenuItem("Key assist");
+        cbMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                octaves.setShowText(!octaves.getShowText());
+                octaves.makeKeys(110,0);
+            }
+        });
         menu.add(cbMenuItem);
 
         cbMenuItem = new JCheckBoxMenuItem("Wait to play");
@@ -105,7 +147,7 @@ public class PianoFrame extends JFrame {
         this.setJMenuBar(menuBar);
     }
 
-    private void addPianoPanel(){
+    private void addPianoPanel(Composition composition){
 
         JPanel piano = new JPanel();
         JPanel buttons = new JPanel();
@@ -132,6 +174,11 @@ public class PianoFrame extends JFrame {
         pause.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                try {
+                    MidiPlayer player = new MidiPlayer();
+                } catch (MidiUnavailableException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -167,15 +214,15 @@ public class PianoFrame extends JFrame {
         c.weighty = 1.0;
         c.insets = new Insets(20, 30, 90, 30);
 
-
-        keys.add(new Octaves());
+        octaves = new Octaves();
+        keys.add(octaves);
         piano.add(buttons, BorderLayout.NORTH);
         piano.add(keys, BorderLayout.CENTER);
         this.add(piano, c);
     }
 
     private FlowView addFlowPanel(){
-        FlowView flow = new FlowView();
+        flow = new FlowView();
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 1;
@@ -195,11 +242,9 @@ public class PianoFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1500, 650);
         MusicSymbol.readMap("map.txt");
-        Composition composition = new Composition("fur_elise3.txt");
-        FlowView flow = addFlowPanel();
-        addPianoPanel();
+        flow = addFlowPanel();
+        addPianoPanel(composition);
         addMenu();
-        flow.loadComposition(composition);
         this.setVisible(true);
     }
 }

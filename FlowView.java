@@ -8,6 +8,7 @@ public class FlowView extends JPanel {
     private static final int NUM_OF_QUARTERS = 10;
     private Composition composition = null;
     private int cursor = 0;
+    private boolean isTxt = false;
 
     public FlowView() {
         setBackground(Color.GRAY);
@@ -19,16 +20,33 @@ public class FlowView extends JPanel {
         repaint();
     }
 
+    public void setTxt(boolean txt) {
+        isTxt = txt;
+    }
+
+    public boolean getTxt() {
+        return isTxt;
+    }
+
     void moveCursor(){
         cursor++;
     }
 
+
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
         for (int i = 0; i < NUM_OF_QUARTERS; i++){
             g.fillRect(i * getWidth()/NUM_OF_QUARTERS, 4 * getHeight()/5, 3, getHeight() / 6);
         }
+
+        if (composition == null)
+            return;
+        System.out.println("flow print");
+
+
         int displayDuration =  0;
         int j = 0;
         while (displayDuration < NUM_OF_QUARTERS * 2){
@@ -52,7 +70,7 @@ public class FlowView extends JPanel {
                     g.fillRect(displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)), getHeight()/2 - getHeight()/20,
                              getWidth()/NUM_OF_QUARTERS, getHeight()/10);
                     g.setColor(Color.black);
-                    g.drawString(symbol.printTxt(true),displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)) +
+                    g.drawString(symbol.printTxt(isTxt),displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)) +
                                     getWidth()/(2 * NUM_OF_QUARTERS), getHeight()/2 + getHeight()/20 );
                 }
                 else {
@@ -60,7 +78,7 @@ public class FlowView extends JPanel {
                     g.fillRect(displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)), getHeight()/2 - getHeight()/20,
                             getWidth()/(2 * NUM_OF_QUARTERS), getHeight()/10);
                     g.setColor(Color.black);
-                    g.drawString(symbol.printTxt(true),displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)) +
+                    g.drawString(symbol.printTxt(isTxt),displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)) +
                                     getWidth()/(4 * NUM_OF_QUARTERS), getHeight()/2 + getHeight()/20);
                 }
             }
@@ -71,7 +89,7 @@ public class FlowView extends JPanel {
                 g.fillRect(displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)), getHeight()/2 - getHeight()/20,
                         getWidth()/NUM_OF_QUARTERS, getHeight()/10);
                 g.setColor(Color.black);
-                g.drawString(((Chord) symbol).printTxtIndex(true, 0),displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)) +
+                g.drawString(((Chord) symbol).printTxtIndex(isTxt, 0),displayDuration * (getWidth()/(NUM_OF_QUARTERS * 2)) +
                         getWidth()/(2 * NUM_OF_QUARTERS), getHeight()/2 + getHeight()/20 );
                 for (int i = 1; i < chord.arrayLen(); i++) {
                     if (i % 2 == 0) { //DOWN
@@ -79,7 +97,7 @@ public class FlowView extends JPanel {
                         g.fillRect(displayDuration * (getWidth() / (NUM_OF_QUARTERS * 2)), getHeight() / 2 + getHeight() / 20,
                                 getWidth() / NUM_OF_QUARTERS, getHeight() / 10);
                         g.setColor(Color.black);
-                        g.drawString(((Chord) symbol).printTxtIndex(true, i), displayDuration * (getWidth() / (NUM_OF_QUARTERS * 2)) +
+                        g.drawString(((Chord) symbol).printTxtIndex(isTxt, i), displayDuration * (getWidth() / (NUM_OF_QUARTERS * 2)) +
                                 getWidth() / (2 * NUM_OF_QUARTERS), getHeight() / 2 + getHeight() / 7);
                     }
                     if (i % 2 == 1) { //UP
@@ -87,7 +105,7 @@ public class FlowView extends JPanel {
                         g.fillRect(displayDuration * (getWidth() / (NUM_OF_QUARTERS * 2)), getHeight() / 2 - getHeight() / 7,
                                 getWidth() / NUM_OF_QUARTERS, getHeight() / 10);
                         g.setColor(Color.black);
-                        g.drawString(((Chord) symbol).printTxtIndex(true, i), displayDuration * (getWidth() / (NUM_OF_QUARTERS * 2)) +
+                        g.drawString(((Chord) symbol).printTxtIndex(isTxt, i), displayDuration * (getWidth() / (NUM_OF_QUARTERS * 2)) +
                                 getWidth() / (2 * NUM_OF_QUARTERS), getHeight() / 2 - getHeight() / 20);
                     }
                 }

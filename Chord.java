@@ -44,5 +44,4 @@ public class Chord extends MusicSymbol {
     }
 
 
-
 }
