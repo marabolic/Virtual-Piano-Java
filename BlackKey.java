@@ -2,25 +2,42 @@ package symbols;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.event.*;
 
-public class BlackKey extends JButton implements ActionListener {
+public class BlackKey extends JButton implements ChangeListener {
     private int octave;
     private Octaves.BLACK_KEY key;
 
     private int keyCode;
     private String text;
+    private boolean pressed = false;
+    private static int cnt = 0;
+    private MidiPlayer m;
 
-    public BlackKey (int octave, Octaves.BLACK_KEY b){
+    public BlackKey (int octave, Octaves.BLACK_KEY b) throws MidiUnavailableException {
         super();
+        m = new MidiPlayer();
         this.octave = octave;
         key = b;
         text = " ";
         keyCode = getKeyEvent();
-        addActionListener(this);
+        addChangeListener(this);
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyCode, InputEvent.SHIFT_DOWN_MASK),
+                "pressed");
+        getActionMap().put("pressed", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getModel().setPressed(true);
+            }
+        });
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyCode,InputEvent.SHIFT_DOWN_MASK,
+                true), "released");
+        getActionMap().put("released", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                getModel().setPressed(false);
+            }
+        });
     }
 
     public String getMyText() {
@@ -82,16 +99,58 @@ public class BlackKey extends JButton implements ActionListener {
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        try {
-            MidiPlayer m = new MidiPlayer();
-            StringBuilder s = new StringBuilder();
-            s.append(keyToPitch(key)).append("#").append(octave + 2);
-            m.play(MusicSymbol.noteMidi.get(s.toString()));
-        } catch (MidiUnavailableException e) {
-            e.printStackTrace();
+
+    public void stateChanged(ChangeEvent e) {
+        ButtonModel model = getModel();
+
+        if (model.isPressed() != pressed) {
+            if (model.isPressed()) {
+                if (PianoFrame.waitToPlay) {
+                    MusicSymbol symbol = PianoFrame.composition.getIndex(PianoFrame.flow.retCursor());
+                    if (symbol instanceof Note) {
+                        Note n = (Note) symbol;
+                        StringBuilder note = new StringBuilder();
+                        note.append(n.getPitch());
+                        note.append('#');
+                        note.append(n.getOctave());
+                        System.out.println(text);
+                        if (MusicSymbol.noteKey.get(note.toString()).equals(text)) {
+                            PianoFrame.flow.moveCursor();
+                            while (PianoFrame.composition.getIndex(PianoFrame.flow.retCursor()) instanceof Pause){
+                                PianoFrame.flow.moveCursor();
+                            }
+                        }
+                    } else {
+                        if (symbol instanceof Chord) {
+                            Chord c = (Chord)symbol;
+                            for (int i = 0; i < c.arrayLen(); i++){
+                                Note n = (Note) c.getIndex(i);
+                                StringBuilder note = new StringBuilder();
+                                note.append(n.getPitch());
+                                note.append('#');
+                                note.append(n.getOctave());
+                                if (MusicSymbol.noteKey.get(note.toString()).equals(text)) {
+                                    cnt++;
+                                }
+                            }
+                            if (cnt == c.arrayLen()) {
+                                PianoFrame.flow.moveCursor();
+                                while (PianoFrame.composition.getIndex(PianoFrame.flow.retCursor()) instanceof Pause){
+                                    PianoFrame.flow.moveCursor();
+                                }
+                                cnt = 0;
+                            }
+                        } else { //Pause
+                            PianoFrame.flow.moveCursor();
+                        }
+                    }
+                }
+                m.play(MusicSymbol.noteMidi.get(MusicSymbol.keyNote.get(text)));
+            } else {
+                m.release(MusicSymbol.noteMidi.get(MusicSymbol.keyNote.get(text)));
+            }
         }
+        pressed = model.isPressed();
     }
 
 }

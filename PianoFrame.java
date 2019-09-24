@@ -21,6 +21,8 @@ public class PianoFrame extends JFrame {
     public static Octaves octaves;
     public static MusicPlayer player;
 
+    public static boolean waitToPlay = false;
+
     public PianoFrame() {
         super("Virtual Piano");
         createEnviroment();
@@ -149,7 +151,7 @@ public class PianoFrame extends JFrame {
         cbMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
+                waitToPlay = !waitToPlay;
             }
         });
         menu.add(cbMenuItem);
@@ -182,6 +184,7 @@ public class PianoFrame extends JFrame {
             public void actionPerformed(ActionEvent actionEvent) {
                 if (player == null || player.isRunCompleted())
                     player = new MusicPlayer();
+                if (waitToPlay) return;
                 player.play();
             }
         });

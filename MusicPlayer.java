@@ -1,11 +1,13 @@
 package symbols;
 
 import javax.sound.midi.MidiUnavailableException;
+import java.io.PipedInputStream;
 
 public class MusicPlayer extends Thread {
 
     private boolean flag = false;
     private boolean runCompleted = false;
+    private boolean waitToPlayCondition;
 
     public MusicPlayer() {
         start();
@@ -30,7 +32,7 @@ public class MusicPlayer extends Thread {
             return;
         }
         try {
-        for (int i = 0; i < PianoFrame.composition.compositionSize(); i++) {
+            for (int i = 0; i < PianoFrame.composition.compositionSize(); i++) {
                 if (interrupted()) {
                     runCompleted = true;
                     return;
@@ -38,9 +40,11 @@ public class MusicPlayer extends Thread {
                 synchronized (this) {
                     while (!flag) wait();
                 }
+                //while (PianoFrame.waitToPlay){}
+
                 MidiPlayer m = new MidiPlayer();
                 if (PianoFrame.composition.getIndex(i) instanceof Note) {
-                    Note n = (Note)PianoFrame.composition.getIndex(i);
+                    Note n = (Note) PianoFrame.composition.getIndex(i);
                     StringBuilder note = new StringBuilder();
                     note.append(n.getPitch());
                     if (n.isSharp())
@@ -54,14 +58,14 @@ public class MusicPlayer extends Thread {
                     PianoFrame.flow.repaint();
                 } else {
                     if (PianoFrame.composition.getIndex(i) instanceof Pause) {
-                        Pause p = (Pause)PianoFrame.composition.getIndex(i);
+                        Pause p = (Pause) PianoFrame.composition.getIndex(i);
                         if (p.getDuration() == MusicSymbol.DURATION.QUARTER)
                             m.pause(PianoFrame.LONG_PAUSE);
                         else
                             m.pause(PianoFrame.SHORT_PAUSE);
                         PianoFrame.flow.moveCursor();
                     } else {  //Chord
-                        Chord c = (Chord)PianoFrame.composition.getIndex(i);
+                        Chord c = (Chord) PianoFrame.composition.getIndex(i);
                         for (int j = 0; j < c.arrayLen(); j++) {
                             Note n = (Note) c.getIndex(j);
                             StringBuilder note = new StringBuilder();

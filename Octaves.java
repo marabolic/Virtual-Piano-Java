@@ -1,5 +1,6 @@
 package symbols;
 
+import javax.sound.midi.MidiUnavailableException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -30,7 +31,11 @@ public class Octaves extends JLayeredPane {
         requestFocusInWindow();
         whiteKeyArray = new ArrayList<WhiteKey>();
         blackKeyArray = new ArrayList<BlackKey>();
-        makeKeys(x, y);
+        try {
+            makeKeys(x, y);
+        } catch (MidiUnavailableException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean getShowText() {
@@ -56,9 +61,10 @@ public class Octaves extends JLayeredPane {
         }
     }
 
-    public void makeKeys(int x, int y) {
+    public void makeKeys(int x, int y) throws MidiUnavailableException {
         for (int i = 0; i < PianoFrame.NUM_OCTAVES; i++) {
             for (int j = 0; j < PianoFrame.NUM_KEYS; j++) {
+
                 WhiteKey whiteButton = new WhiteKey(i, j);
                 whiteButton.setBounds(x + i * OCTAVE_WIDTH + i * GAP, y, WHITE_W, WHITE_H);
                 whiteButton.setBackground(Color.white);

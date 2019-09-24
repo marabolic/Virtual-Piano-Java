@@ -20,6 +20,10 @@ public class FlowView extends JPanel {
         repaint();
     }
 
+    public int retCursor(){
+        return cursor;
+    }
+
     public void resetCursor(){
         cursor = 0;
     }

@@ -65,13 +65,16 @@ public class Note extends MusicSymbol {
 
     }
 
-    @Override
-    public String toString() {
-        StringBuilder note = new StringBuilder();
+    //@Override
+    //public String toString() {
+        /*StringBuilder note = new StringBuilder();
         note.append(pitch);
         if (sharp)
             note.append('#');
         note.append(octave);
         return note.toString();
-    }
+
+         */
+
+   // }
 }
