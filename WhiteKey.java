@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.sql.Time;
 import java.util.HashMap;
 
 
@@ -20,13 +22,13 @@ public class WhiteKey extends JButton implements ChangeListener {
     private boolean pressed = false;
     private MidiPlayer m;
     private static int cnt = 0;
+    private long time = 0;
 
     public static HashMap<Integer, Integer> keyButtons;
 
     public WhiteKey(int octave, int key) throws MidiUnavailableException {
         super();
         m = new MidiPlayer();
-
         this.octave = octave;
         this.key = key;
         keyCode = getKeyEvent();
@@ -121,7 +123,6 @@ public class WhiteKey extends JButton implements ChangeListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         ButtonModel model = getModel();
-
         try {
             if (model.isPressed() != pressed) {
                 if (model.isPressed()) {
@@ -165,12 +166,28 @@ public class WhiteKey extends JButton implements ChangeListener {
                             }
                         }
                     }
+                    else if (PianoFrame.recordPress){
+                        time = System.currentTimeMillis();
+                    }
                     m.play(MusicSymbol.noteMidi.get(MusicSymbol.keyNote.get(text)));
                 } else {
                     m.release(MusicSymbol.noteMidi.get(MusicSymbol.keyNote.get(text)));
+                    time = System.currentTimeMillis() - time;
+                    if (time < 400) {
+                        PianoFrame.myComposition.append("[");
+                        PianoFrame.myComposition.append(text);
+                        PianoFrame.myComposition.append("]");
+                    }
+                    else {
+                        PianoFrame.myComposition.append(text);
+                    }
+
                 }
             }
             pressed = model.isPressed();
-        } catch (IndexOutOfBoundsException g){}
+        } catch (IndexOutOfBoundsException | IOException g){
+
+        }
     }
+
 }

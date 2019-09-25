@@ -10,6 +10,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class PianoFrame extends JFrame {
 
@@ -20,8 +23,10 @@ public class PianoFrame extends JFrame {
     public static FlowView flow;
     public static Octaves octaves;
     public static MusicPlayer player;
+    public static FileWriter myComposition;
 
     public static boolean waitToPlay = false;
+    public static boolean recordPress = false;
 
     public PianoFrame() {
         super("Virtual Piano");
@@ -178,6 +183,7 @@ public class PianoFrame extends JFrame {
         stop.setForeground(Color.black);
         record = new JButton("⏺");
         record.setForeground(Color.red);
+        SpaceKey spaceKey = new SpaceKey();
 
         start.addActionListener(new ActionListener() {
             @Override
@@ -207,7 +213,20 @@ public class PianoFrame extends JFrame {
         record.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
+                recordPress = !recordPress;
+                if (recordPress){
+                    try {
+                        myComposition = new FileWriter("myComp.txt");
+                    } catch (IOException e) {
 
+                    }
+                }
+                else{
+                    try {
+                        myComposition.close();
+                    } catch (IOException e) {
+                    }
+                }
             }
         });
 
@@ -216,6 +235,7 @@ public class PianoFrame extends JFrame {
         buttons.add(pause);
         buttons.add(stop);
         buttons.add(record);
+        buttons.add(spaceKey);
 
         keys.setBackground(Color.DARK_GRAY);
         piano.setBackground(Color.DARK_GRAY);

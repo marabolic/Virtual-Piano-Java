@@ -34,7 +34,7 @@ public class Octaves extends JLayeredPane {
         try {
             makeKeys(x, y);
         } catch (MidiUnavailableException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -62,6 +62,8 @@ public class Octaves extends JLayeredPane {
     }
 
     public void makeKeys(int x, int y) throws MidiUnavailableException {
+
+
         for (int i = 0; i < PianoFrame.NUM_OCTAVES; i++) {
             for (int j = 0; j < PianoFrame.NUM_KEYS; j++) {
 
